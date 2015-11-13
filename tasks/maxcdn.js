@@ -21,7 +21,7 @@ module.exports = function (grunt) {
       grunt.fail.fatal('Sorry! Only delete method is supported.');
       return done();
     }
-    
+
     var files = [];
     var MaxCDN = require('maxcdn');
     var maxcdn = new MaxCDN(
@@ -38,15 +38,15 @@ module.exports = function (grunt) {
     });
 
     maxcdn.delete(
-      'zones/pull.json/' + options.zone_id + '/cache', 
+      'zones/pull.json/' + options.zone_id + '/cache',
       { files: files },
       function (err, response) {
         if (err) {
-          grunt.log.error(err);
+          grunt.log.error(JSON.stringify(err));
           return done();
         }
 
-        console.log(response);
+        console.log(JSON.stringify(response));
         done(true);
       });
   });
