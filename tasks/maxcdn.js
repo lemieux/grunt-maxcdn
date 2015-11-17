@@ -1,16 +1,11 @@
 'use strict';
 
-module.exports = function (grunt) {
+module.exports = function(grunt) {
 
-  grunt.registerMultiTask('maxcdn', 'Interact with the MaxCDN API', function () {
+  grunt.registerMultiTask('maxcdn', 'Interact with the MaxCDN API', function() {
 
     var done = this.async();
     var options = this.options();
-
-    if (!this.files) {
-      grunt.fail.fatal('files is mandatory');
-      return done();
-    }
 
     if (!options.zone_id) {
       grunt.fail.fatal('options.zone_id is mandatory');
@@ -22,7 +17,6 @@ module.exports = function (grunt) {
       return done();
     }
 
-    var files = [];
     var MaxCDN = require('maxcdn');
     var maxcdn = new MaxCDN(
       options.companyAlias,
@@ -32,23 +26,41 @@ module.exports = function (grunt) {
 
     grunt.log.writeln('Purging cache...');
 
-    this.files.forEach(function (f) {
-      grunt.log.writeln('\t' + f.dest);
-      files.push(f.dest);
-    });
+    if (this.files) {
 
-    maxcdn.delete(
-      'zones/pull.json/' + options.zone_id + '/cache',
-      { files: files },
-      function (err, response) {
-        if (err) {
-          grunt.log.error(JSON.stringify(err));
-          return done();
-        }
-
-        console.log(JSON.stringify(response));
-        done(true);
+      var files = [];
+      this.files.forEach(function(f) {
+        grunt.log.writeln('\t' + f.dest);
+        files.push(f.dest);
       });
+
+      maxcdn.delete(
+        'zones/pull.json/' + options.zone_id + '/cache',
+        {
+          files: files
+        },
+        function(err, response) {
+          if (err) {
+            grunt.log.error(JSON.stringify(err));
+            return done();
+          }
+
+          console.log(JSON.stringify(response));
+          done(true);
+        });
+    } else {
+      maxcdn.delete(
+        'zones/pull.json/' + options.zone_id + '/cache',
+        function(err, response) {
+          if (err) {
+            grunt.log.error(JSON.stringify(err));
+            return done();
+          }
+
+          console.log(JSON.stringify(response));
+          done(true);
+        });
+    }
   });
 
 };
